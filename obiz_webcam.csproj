@@ -83,11 +83,20 @@
     <PackageReference Include="AForge">
       <Version>2.2.5</Version>
     </PackageReference>
+    <PackageReference Include="AForge.Controls">
+      <Version>2.2.5</Version>
+    </PackageReference>
+    <PackageReference Include="AForge.Imaging">
+      <Version>2.2.5</Version>
+    </PackageReference>
     <PackageReference Include="AForge.Video">
       <Version>2.2.5</Version>
     </PackageReference>
     <PackageReference Include="AForge.Video.DirectShow">
       <Version>2.2.5</Version>
+    </PackageReference>
+    <PackageReference Include="AS.Video.Sources.AForge">
+      <Version>1.0.9.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
