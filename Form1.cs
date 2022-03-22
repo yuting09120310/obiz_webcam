@@ -18,6 +18,7 @@ namespace obiz_webcam
         {
             InitializeComponent();
             setup();
+            Add_Dpi();
         }
 
         FilterInfoCollection USB_Webcams;
@@ -30,15 +31,18 @@ namespace obiz_webcam
             if (USB_Webcams.Count > 0) //如果有偵測到視訊鏡頭
             {
                 button1.Enabled = true;
-                Cam = new VideoCaptureDevice(USB_Webcams[0].MonikerString);
-
-                Cam.NewFrame += Cam_NewFrame;
             }
             else
             {
                 button1.Enabled = false;
                 MessageBox.Show("此機器沒有鏡頭");
             }
+        }
+
+        //加入分辨率
+        public void Add_Dpi()
+        {
+            Cam = new VideoCaptureDevice(USB_Webcams[0].MonikerString);
 
             VideoCapabilities[] videoCapabilities;
 
@@ -50,13 +54,30 @@ namespace obiz_webcam
                     comboBox1.Items.Add(capabilty.FrameSize);
                 }
             }
+            if(comboBox1.Items.Count > 0)
+            {
+                comboBox1.SelectedIndex = 0;
+            }
         }
 
+
+        //設定dpi
+        public void Set_Dpi()
+        {
+            Cam = new VideoCaptureDevice(USB_Webcams[0].MonikerString);
+            Cam.VideoResolution = Cam.VideoCapabilities[comboBox1.SelectedIndex];
+
+            Cam.NewFrame += Cam_NewFrame;
+        }
+
+
+        //啟用或關閉
         private void button1_Click(object sender, EventArgs e)
         {
             if (button1.Text == "Start")
             {
                 button1.Text = "Stop";
+                Set_Dpi();
                 Cam.Start();
             }
             else
@@ -74,7 +95,7 @@ namespace obiz_webcam
         }
 
 
-        //關閉鏡頭
+        //關閉視窗
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             Cam.Stop();
