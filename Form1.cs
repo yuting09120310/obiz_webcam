@@ -10,11 +10,15 @@ using System.Windows.Forms;
 using AForge.Video;
 using AForge.Video.DirectShow;
 using AForge.Controls;
+using obiz_load_data;
 
 namespace obiz_webcam
 {
     public partial class Form1 : Form
     {
+        string AppName = "obiz_webcam";
+        Msg_log msg_Log = new Msg_log();
+
         public Form1()
         {
             InitializeComponent();
@@ -28,39 +32,51 @@ namespace obiz_webcam
 
         public void setup()
         {
-            USB_Webcams = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            
-            if (USB_Webcams.Count > 0) //如果有偵測到視訊鏡頭
+            try
             {
-                Btn_Cam.Enabled = true;
-            }
-            else
+                USB_Webcams = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+
+                if (USB_Webcams.Count > 0) //如果有偵測到視訊鏡頭
+                {
+                    Btn_Cam.Enabled = true;
+                }
+                else
+                {
+                    Btn_Cam.Enabled = false;
+                    MessageBox.Show("此機器沒有鏡頭");
+                }
+            }catch(Exception ex)
             {
-                Btn_Cam.Enabled = false;
-                MessageBox.Show("此機器沒有鏡頭");
+                msg_Log.save_log(AppName, ex);
             }
         }
 
         //加入分辨率到comboxbox
         public void Add_Dpi()
         {
-            Cam = new VideoCaptureDevice(USB_Webcams[0].MonikerString);
-
-            videoSourcePlayer1.VideoSource = Cam;
-
-            VideoCapabilities[] videoCapabilities;
-
-            videoCapabilities = Cam.VideoCapabilities;
-            foreach (VideoCapabilities capabilty in videoCapabilities)
+            try
             {
-                if (!comboBox1.Items.Contains(capabilty.FrameSize))
+                Cam = new VideoCaptureDevice(USB_Webcams[0].MonikerString);
+
+                videoSourcePlayer1.VideoSource = Cam;
+
+                VideoCapabilities[] videoCapabilities;
+
+                videoCapabilities = Cam.VideoCapabilities;
+                foreach (VideoCapabilities capabilty in videoCapabilities)
                 {
-                    comboBox1.Items.Add(capabilty.FrameSize);
+                    if (!comboBox1.Items.Contains(capabilty.FrameSize))
+                    {
+                        comboBox1.Items.Add(capabilty.FrameSize);
+                    }
                 }
-            }
-            if(comboBox1.Items.Count > 0)
+                if (comboBox1.Items.Count > 0)
+                {
+                    comboBox1.SelectedIndex = 0;
+                }
+            }catch(Exception ex)
             {
-                comboBox1.SelectedIndex = 0;
+                msg_Log.save_log(AppName, ex);
             }
         }
 
@@ -68,26 +84,38 @@ namespace obiz_webcam
         //設定dpi
         public void Set_Dpi()
         {
-            Cam = new VideoCaptureDevice(USB_Webcams[0].MonikerString);//選用第一個鏡頭
-            Cam.VideoResolution = Cam.VideoCapabilities[comboBox1.SelectedIndex]; //手動調整index
+            try
+            {
+                Cam = new VideoCaptureDevice(USB_Webcams[0].MonikerString);//選用第一個鏡頭
+                Cam.VideoResolution = Cam.VideoCapabilities[comboBox1.SelectedIndex]; //手動調整index
 
-            videoSourcePlayer1.VideoSource = Cam;
+                videoSourcePlayer1.VideoSource = Cam;
+            }catch(Exception ex)
+            {
+                msg_Log.save_log(AppName, ex);
+            }
         }
 
 
         //啟用或關閉
         private void Btn_Cam_Click(object sender, EventArgs e)
         {
-            if (Btn_Cam.Text == "Start")
+            try
             {
-                Btn_Cam.Text = "Stop";
-                Set_Dpi();
-                videoSourcePlayer1.Start();
-            }
-            else
+                if (Btn_Cam.Text == "Start")
+                {
+                    Btn_Cam.Text = "Stop";
+                    Set_Dpi();
+                    videoSourcePlayer1.Start();
+                }
+                else
+                {
+                    Btn_Cam.Text = "Start";
+                    videoSourcePlayer1.Stop();
+                }
+            }catch(Exception ex)
             {
-                Btn_Cam.Text = "Start";
-                videoSourcePlayer1.Stop();
+                msg_Log.save_log(AppName, ex);
             }
         }
 
@@ -95,19 +123,31 @@ namespace obiz_webcam
         //關閉視窗
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Cam.Stop();
+            try
+            {
+                Cam.Stop();
+            }catch(Exception ex)
+            {
+                msg_Log.save_log(AppName, ex);
+            }
         }
 
 
         //儲存功能
         private void Btn_save_Click(object sender, EventArgs e)
         {
-            Bitmap img = videoSourcePlayer1.GetCurrentVideoFrame();
-            pictureBox1.Image = img;
-
-            if (sfd.ShowDialog() == DialogResult.OK)
+            try
             {
-                pictureBox1.Image.Save(sfd.FileName);
+                Bitmap img = videoSourcePlayer1.GetCurrentVideoFrame();
+                pictureBox1.Image = img;
+
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    pictureBox1.Image.Save(sfd.FileName);
+                }
+            }catch(Exception ex)
+            {
+                msg_Log.save_log(AppName, ex);
             }
         }
     }
