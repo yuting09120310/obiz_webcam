@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using AForge.Video;
 using AForge.Video.DirectShow;
 using AForge.Controls;
-using obiz_load_data;
+using Alex_Component;
 
 namespace obiz_webcam
 {
